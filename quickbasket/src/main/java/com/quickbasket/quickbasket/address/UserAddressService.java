@@ -43,4 +43,21 @@ public class UserAddressService {
 
         return new UserAddressResponse(savedAddress);
     }
+
+    public UserAddressResponse changeStatus(String userId, String addressId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        UserAddress userAddress = userAddressRepository.findById(addressId)
+                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+
+        userAddressRepository.changeAllUserAddressStatus(userId,100);
+
+        userAddress.setStatus(100);
+
+        UserAddress savedAddress = userAddressRepository.save(userAddress);
+        return new UserAddressResponse(savedAddress);
+
+
+    }
 }

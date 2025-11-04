@@ -1,5 +1,6 @@
 package com.quickbasket.quickbasket.customs.services;
 
+import com.quickbasket.quickbasket.security.CustomUserDetails;
 import com.quickbasket.quickbasket.user.User;
 import com.quickbasket.quickbasket.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +33,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             );
         });
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getId(),
-                authorities
-        );
+        return new CustomUserDetails(user);
     }
 }

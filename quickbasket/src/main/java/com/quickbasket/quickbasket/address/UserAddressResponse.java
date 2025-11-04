@@ -15,6 +15,7 @@ public class UserAddressResponse {
     private String latitude;
     private Integer status;
     private String userId;
+    private String id;
 
     public UserAddressResponse(UserAddress userAddress) {
         this.street = userAddress.getStreet();
@@ -24,6 +25,7 @@ public class UserAddressResponse {
         this.longitude = userAddress.getLongitude();
         this.latitude = userAddress.getLatitude();
         this.status = userAddress.getStatus();
+        this.id = userAddress.getId();
         if (userAddress.getUser() != null) {
             this.userId = userAddress.getUser().getId();
         }
