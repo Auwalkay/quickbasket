@@ -23,4 +23,6 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = "Password confirmation is required")
     private String confirmPassword;
+
+    private String role;
 }

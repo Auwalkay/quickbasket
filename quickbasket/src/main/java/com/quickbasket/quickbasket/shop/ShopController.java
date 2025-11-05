@@ -1,7 +1,8 @@
 package com.quickbasket.quickbasket.shop;
 
 import com.quickbasket.quickbasket.customs.response.ApiResponse;
-import lombok.AllArgsConstructor;
+import com.quickbasket.quickbasket.shop.requests.AssignAgentRequest;
+import com.quickbasket.quickbasket.shop.requests.CreateShopRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public class ShopController {
     private final ShopService shopService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/store")
+    @PostMapping("/admin/store")
     public ResponseEntity<ApiResponse> createShop(@RequestBody CreateShopRequest request) {
         try {
             ShopResponse shop = shopService.create(request);
@@ -31,7 +32,7 @@ public class ShopController {
         }
     }
 
-    @GetMapping("/index")
+    @GetMapping("/admin/index")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> index(@RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "10") int size) {
@@ -46,12 +47,26 @@ public class ShopController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{shopId}/show")
+    @GetMapping("/admin/{shopId}/show")
     public ResponseEntity<ApiResponse> show(@PathVariable String shopId) {
         try{
             ShopResponse shopResponse = shopService.show(shopId);
 
             return ResponseEntity.ok(new ApiResponse(true, "success", shopResponse));
+        }catch (Exception ex){
+            log.error(ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(false, ex.getMessage(), null));
+        }
+    }
+
+    @PatchMapping("/admin/assignAgent")
+    public ResponseEntity<ApiResponse> AssignAgent(@RequestBody AssignAgentRequest request){
+        try{
+
+            ShopResponse shopResponse= shopService.assignAgent(request);
+
+            return ResponseEntity.ok(new ApiResponse(true, "success", shopResponse));
+
         }catch (Exception ex){
             log.error(ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(false, ex.getMessage(), null));

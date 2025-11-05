@@ -1,6 +1,7 @@
 package com.quickbasket.quickbasket.shop;
 
 import com.quickbasket.quickbasket.customs.Utils.BaseEntity;
+import com.quickbasket.quickbasket.shop.requests.CreateShopRequest;
 import com.quickbasket.quickbasket.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

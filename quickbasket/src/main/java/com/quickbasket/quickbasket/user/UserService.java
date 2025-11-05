@@ -4,11 +4,16 @@ import com.quickbasket.quickbasket.customs.Utils.JwtUtil;
 import com.quickbasket.quickbasket.customs.response.LoginResponse;
 import com.quickbasket.quickbasket.role.Role;
 import com.quickbasket.quickbasket.role.RoleRepository;
+import com.quickbasket.quickbasket.shop.ShopResponse;
 import com.quickbasket.quickbasket.user.requests.LoginRequest;
+import com.quickbasket.quickbasket.user.requests.UserFilterRequest;
 import com.quickbasket.quickbasket.user.requests.UserRegistrationRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +47,11 @@ public class UserService {
             user.setEmail(request.getEmail());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
 
+            if (request.getRole().equalsIgnoreCase("ROLE_AGENT")){
+                user.set_email_verified(true);
+            }
 
-            Role defaultRole = roleRepository.findByName("ROLE_USER")
+            Role defaultRole = roleRepository.findByName(request.getRole())
                     .orElseThrow(() -> new RuntimeException("role not found"));
             user.setRoles(Set.of(defaultRole));
 
@@ -95,5 +103,31 @@ public class UserService {
             log.error("Unable to login user {}",exception.getMessage());
             throw new RuntimeException(exception.getMessage());
         }
+    }
+
+    public Page<UserResponse> getAllUsers(UserFilterRequest request){
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+
+        if (request.getRole() != null && request.getSearch() != null) {
+            return userRepository
+                    .findByRoleAndSearch(request.getRole(), request.getSearch(),pageable)
+                    .map(UserResponse::new);
+        }
+
+        // If search keyword exists → search + paginate
+        if (request.getSearch() != null && !request.getSearch().isEmpty()) {
+            return userRepository
+                    .findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                            request.getSearch(), request.getSearch(), request.getSearch(), pageable)
+                    .map(UserResponse::new);
+        }
+
+        if (request.getRole() != null) {
+            return userRepository
+                    .findByRole(request.getRole(), pageable)
+                    .map(UserResponse::new);
+        }
+
+        return userRepository.findAll(pageable).map(UserResponse::new);
     }
 }

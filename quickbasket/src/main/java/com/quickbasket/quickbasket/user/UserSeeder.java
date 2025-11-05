@@ -31,7 +31,7 @@ public class UserSeeder implements CommandLineRunner {
 
         // ✅ Ensure ADMIN role exists
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                .orElseThrow(() -> new RuntimeException("Admin Role Not Found"));
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
 
         // ✅ Create admin user
         User user = new User();
